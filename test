@@ -121,8 +121,10 @@ function Library:Window(title)
     Close.ImageColor3 = Color3.fromRGB(199, 199, 199)
     Close.ScaleType = Enum.ScaleType.Crop
     Close.MouseButton1Click:connect(function()
-        ui:Remove()
+        Main.Visible = false
+        Circle.Visible = true  -- Show the circle when the UI is closed
     end)
+    
     Close.MouseEnter:connect(function()
         TweenService:Create(Close, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageColor3 = Color3.fromRGB(255, 255, 255)}, true):Play()
     end)
@@ -178,43 +180,31 @@ function Library:Window(title)
     UIPadding.Parent = TabsContainer
     UIPadding.PaddingTop = UDim.new(0, 5)
 
-local TweenService = game:GetService("TweenService")
+    local isDragging = false
+    local dragStart = nil
+    local startPos = nil
 
-local isDragging = false
-local dragStart = nil
-local startPos = nil
-local dragTween = nil
-
--- Mouse Drag Functionality
-Top.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        isDragging = true
-        dragStart = input.Position
-        startPos = Main.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                isDragging = false
-                if dragTween then
-                    dragTween:Cancel()
+    -- Mouse Drag Functionality
+    Top.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isDragging = true
+            dragStart = input.Position
+            startPos = Main.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    isDragging = false
                 end
-            end
-        end)
-    end
-end)
-
-Top.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
-        local delta = input.Position - dragStart
-        local newPosition = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        
-        if dragTween then
-            dragTween:Cancel()
+            end)
         end
-        
-        dragTween = TweenService:Create(Main, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = newPosition})
-        dragTween:Play()
-    end
-end)
+    end)
+
+    Top.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
+            local delta = input.Position - dragStart
+            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+
     -- Resize Functionality (existing code)
     local function GRIR_fake_script() -- Resize.LocalScript 
         local script = Instance.new('LocalScript', Resize)
@@ -796,10 +786,55 @@ end)
                 OptionHolder:TweenSize(UDim2.new(1, 0, 0, OptionList.AbsoluteContentSize.Y + 15), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, .15, true)
             end
             return DropdownFunc
-end
         end
+
         return TabFunctions
     end
+    
+    -- Circle for reopening the UI
+    local Circle = Instance.new("Frame")
+    Circle.Name = "Circle"
+    Circle.Parent = ui
+    Circle.BackgroundColor3 = Color3.fromRGB(232, 17, 85)
+    Circle.Size = UDim2.new(0, 50, 0, 50)
+    Circle.Position = UDim2.new(0.5, -25, 0.5, -25)
+    Circle.AnchorPoint = Vector2.new(0.5, 0.5)
+    Circle.Visible = false -- Initially hidden
+
+    local CircleUICorner = Instance.new("UICorner")
+    CircleUICorner.Parent = Circle
+    CircleUICorner.CornerRadius = UDim.new(1, 0) -- Make it a circle
+
+    Circle.MouseButton1Click:Connect(function()
+        Main.Visible = true
+        Circle.Visible = false -- Hide the circle when reopening the UI
+    end)
+
+    -- Mouse Drag Functionality for the Circle
+    local isCircleDragging = false
+    local circleDragStart = nil
+    local circleStartPos = nil
+
+    Circle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isCircleDragging = true
+            circleDragStart = input.Position
+            circleStartPos = Circle.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    isCircleDragging = false
+                end
+            end)
+        end
+    end)
+
+    Circle.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement and isCircleDragging then
+            local delta = input.Position - circleDragStart
+            Circle.Position = UDim2.new(circleStartPos.X.Scale, circleStartPos.X.Offset + delta.X, circleStartPos.Y.Scale, circleStartPos.Y.Offset + delta.Y)
+        end
+    end)
+
     return Tabs
 end
 return Library
