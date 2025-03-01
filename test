@@ -27,15 +27,14 @@ function Library:Window(title)
     local TabsContainer = Instance.new("Frame")
     local UIPadding = Instance.new("UIPadding")
     local Resize = Instance.new("ImageButton")
-    local CircleButton = Instance.new("TextButton") -- Circle button for reopening the UI
-
+    
     ui.Name = "ui"
     ui.Parent = game.CoreGui
     ui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
     Main.Name = "Main"
     Main.Parent = ui
-    Main.BackgroundColor3 = Color3.fromRGB(200, 175, 255) -- Light purple color
+    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     Main.BorderSizePixel = 0
     Main.Position = UDim2.new(0.377, 0, 0.368, 0)
     Main.Size = UDim2.new(0, 470, 0, 283)
@@ -123,9 +122,7 @@ function Library:Window(title)
     Close.ScaleType = Enum.ScaleType.Crop
     Close.MouseButton1Click:connect(function()
         ui:Remove()
-        CircleButton.Visible = true  -- Show the circle button when the UI is closed
     end)
-
     Close.MouseEnter:connect(function()
         TweenService:Create(Close, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageColor3 = Color3.fromRGB(255, 255, 255)}, true):Play()
     end)
@@ -206,27 +203,8 @@ function Library:Window(title)
         end
     end)
 
-    -- Circle button to reopen UI
-    CircleButton.Name = "CircleButton"
-    CircleButton.Parent = ui
-    CircleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Circle color
-    CircleButton.Size = UDim2.new(0, 50, 0, 50)
-    CircleButton.Position = UDim2.new(0.5, -25, 0.5, -25) -- Center the circle on the screen
-    CircleButton.Text = ""
-    CircleButton.Visible = false -- Initially hidden
-
-    local CircleUICorner = Instance.new("UICorner")
-    CircleUICorner.Parent = CircleButton
-    CircleUICorner.CornerRadius = UDim.new(1, 0) -- Make it a circle
-
-    CircleButton.MouseButton1Click:Connect(function()
-        ui.Parent = game.CoreGui -- Reparent UI to make it visible again
-        Main.Position = UDim2.new(0.377, 0, 0.368, 0) -- Reset position if needed
-        CircleButton.Visible = false -- Hide the circle button again
-    end)
-
-    -- Resize Functionality
-    local function ResizeScript()
+    -- Resize Functionality (existing code)
+    local function GRIR_fake_script() -- Resize.LocalScript 
         local script = Instance.new('LocalScript', Resize)
 
         local mouse = game.Players.LocalPlayer:GetMouse()
@@ -247,7 +225,7 @@ function Library:Window(title)
                 local DeltaX = input:GetMouseLocation().X - locationX
                 local DeltaY = input:GetMouseLocation().Y - locationY
 
-                Main.Size = Main.Size + UDim2.new(0, DeltaX, 0, DeltaY)
+                Main.Size = Main.Size + UDim2.new(0,DeltaX,0,DeltaY)
                 locationX = input:GetMouseLocation().X
                 locationY = input:GetMouseLocation().Y
             end)
@@ -267,8 +245,9 @@ function Library:Window(title)
                 Main.Size = UDim2.new(0, Main.Size.X.Offset, 0, defaultY)
             end
         end)
+
     end
-    coroutine.wrap(ResizeScript)()
+    coroutine.wrap(GRIR_fake_script)()
 
     local Tabs = {}
     function Tabs:Tab(title)
@@ -286,7 +265,7 @@ function Library:Window(title)
         TabButton.AutoButtonColor = false
         TabButton.Font = Enum.Font.Gotham
         TabButton.Text = title or 'Home'
-        TabButton.TextColor3 = Color3.fromRGB(72, 72, 72)
+        TabButton.TextColor3 = Color3.fromRGB(72,72,72)
         TabButton.TextSize = 14.000
 
         UICorner.CornerRadius = UDim.new(0, 6)
@@ -333,7 +312,7 @@ function Library:Window(title)
             end
             
             TweenService:Create(TabButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0.6}):Play()
-            TweenService:Create(TabButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+            TweenService:Create(TabButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextColor3 = Color3.fromRGB(255,255,255)}):Play()
         end)
 
         local TabFunctions = {}
