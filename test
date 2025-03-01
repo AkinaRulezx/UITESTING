@@ -121,10 +121,8 @@ function Library:Window(title)
     Close.ImageColor3 = Color3.fromRGB(199, 199, 199)
     Close.ScaleType = Enum.ScaleType.Crop
     Close.MouseButton1Click:connect(function()
-        Main.Visible = false
-        Circle.Visible = true  -- Show the circle when the UI is closed
+        ui:Remove()
     end)
-    
     Close.MouseEnter:connect(function()
         TweenService:Create(Close, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {ImageColor3 = Color3.fromRGB(255, 255, 255)}, true):Play()
     end)
@@ -787,54 +785,5 @@ function Library:Window(title)
             end
             return DropdownFunc
         end
-
         return TabFunctions
     end
-    
-    -- Circle for reopening the UI
-    local Circle = Instance.new("Frame")
-    Circle.Name = "Circle"
-    Circle.Parent = ui
-    Circle.BackgroundColor3 = Color3.fromRGB(232, 17, 85)
-    Circle.Size = UDim2.new(0, 50, 0, 50)
-    Circle.Position = UDim2.new(0.5, -25, 0.5, -25)
-    Circle.AnchorPoint = Vector2.new(0.5, 0.5)
-    Circle.Visible = false -- Initially hidden
-
-    local CircleUICorner = Instance.new("UICorner")
-    CircleUICorner.Parent = Circle
-    CircleUICorner.CornerRadius = UDim.new(1, 0) -- Make it a circle
-
-    Circle.MouseButton1Click:Connect(function()
-        Main.Visible = true
-        Circle.Visible = false -- Hide the circle when reopening the UI
-    end)
-
-    -- Mouse Drag Functionality for the Circle
-    local isCircleDragging = false
-    local circleDragStart = nil
-    local circleStartPos = nil
-
-    Circle.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            isCircleDragging = true
-            circleDragStart = input.Position
-            circleStartPos = Circle.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    isCircleDragging = false
-                end
-            end)
-        end
-    end)
-
-    Circle.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and isCircleDragging then
-            local delta = input.Position - circleDragStart
-            Circle.Position = UDim2.new(circleStartPos.X.Scale, circleStartPos.X.Offset + delta.X, circleStartPos.Y.Scale, circleStartPos.Y.Offset + delta.Y)
-        end
-    end)
-
-    return Tabs
-end
-return Library
