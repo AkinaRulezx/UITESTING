@@ -178,31 +178,43 @@ function Library:Window(title)
     UIPadding.Parent = TabsContainer
     UIPadding.PaddingTop = UDim.new(0, 5)
 
-    local isDragging = false
-    local dragStart = nil
-    local startPos = nil
+local TweenService = game:GetService("TweenService")
 
-    -- Mouse Drag Functionality
-    Top.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            isDragging = true
-            dragStart = input.Position
-            startPos = Main.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    isDragging = false
+local isDragging = false
+local dragStart = nil
+local startPos = nil
+local dragTween = nil
+
+-- Mouse Drag Functionality
+Top.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStart = input.Position
+        startPos = Main.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                isDragging = false
+                if dragTween then
+                    dragTween:Cancel()
                 end
-            end)
-        end
-    end)
+            end
+        end)
+    end
+end)
 
-    Top.InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
-            local delta = input.Position - dragStart
-            Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+Top.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and isDragging then
+        local delta = input.Position - dragStart
+        local newPosition = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        
+        if dragTween then
+            dragTween:Cancel()
         end
-    end)
-
+        
+        dragTween = TweenService:Create(Main, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = newPosition})
+        dragTween:Play()
+    end
+end)
     -- Resize Functionality (existing code)
     local function GRIR_fake_script() -- Resize.LocalScript 
         local script = Instance.new('LocalScript', Resize)
